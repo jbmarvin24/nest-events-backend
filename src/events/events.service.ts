@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { paginate, PaginateOptions } from '../pagination/paginator';
 import { AttendeeAnswerEnum } from './attendee.entity';
 import { ListEvents, WhenEventFilter } from './dto/list.events';
 import { Event } from './event.entity';
@@ -50,10 +51,10 @@ export class EventsService {
       );
   }
 
-  public async getEventsWithAttendeeCountFiltered(filter?: ListEvents) {
+  private getEventsWithAttendeeCountFiltered(filter?: ListEvents) {
     let query = this.getEventsWithAttendeeCountQuery();
 
-    if (!filter) return await query.getMany();
+    if (!filter) return query;
 
     if (filter.when) {
       if (filter.when == WhenEventFilter.Today) {
@@ -79,7 +80,17 @@ export class EventsService {
       }
     }
 
-    return await query.getMany();
+    return query;
+  }
+
+  public async getEventsWithAttendeeCountFilteredPaginated(
+    filter: ListEvents,
+    paginationOptions: PaginateOptions,
+  ) {
+    return await paginate(
+      this.getEventsWithAttendeeCountFiltered(filter),
+      paginationOptions,
+    );
   }
 
   public async getEvent(id: number): Promise<Event | undefined> {
