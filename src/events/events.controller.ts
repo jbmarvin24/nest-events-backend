@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -46,11 +47,17 @@ export class EventsController {
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.repository.findOne({
+    const event = await this.repository.findOne({
       where: {
         id,
       },
     });
+
+    if (!event) {
+      throw new NotFoundException();
+    }
+
+    return event;
   }
 
   @Post()
@@ -63,13 +70,15 @@ export class EventsController {
 
   @Patch(':id')
   async update(@Param('id') id, @Body() dto: UpdateEventDto) {
-    console.log(id);
-
     const event = await this.repository.findOne({
       where: {
         id,
       },
     });
+
+    if (!event) {
+      throw new NotFoundException();
+    }
 
     return await this.repository.save({
       ...event,
@@ -86,6 +95,10 @@ export class EventsController {
         id,
       },
     });
+
+    if (!event) {
+      throw new NotFoundException();
+    }
     return await this.repository.remove(event);
   }
 }
