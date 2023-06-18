@@ -118,18 +118,16 @@ export class EventsController {
     });
   }
 
+  // @Post('/remove')
+  // public async removingRelation() {}
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id) {
-    const event = await this.repository.findOne({
-      where: {
-        id,
-      },
-    });
+    const result = await this.eventsService.deleteEvent(id);
 
-    if (!event) {
+    if (result.affected === 0) {
       throw new NotFoundException();
     }
-    return await this.repository.remove(event);
   }
 }
