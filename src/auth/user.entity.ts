@@ -7,6 +7,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Attendee } from '../events/attendee.entity';
 import { Event } from '../events/event.entity';
 import { Profile } from './profile.entity';
 
@@ -39,4 +40,7 @@ export class User {
   @OneToMany(() => Event, (event) => event.organizer)
   @Expose()
   organized: Event[];
+
+  @OneToMany(() => Attendee, (attende) => attende.user)
+  attended: Attendee[];
 }
