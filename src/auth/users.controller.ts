@@ -1,4 +1,12 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Post,
+  SerializeOptions,
+  UseInterceptors,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
@@ -6,6 +14,7 @@ import { CreateUserDto } from './dto/create.user.dto';
 import { User } from './user.entity';
 
 @Controller('users')
+@SerializeOptions({ strategy: 'excludeAll' })
 export class UsersController {
   constructor(
     private readonly authService: AuthService,
@@ -15,6 +24,7 @@ export class UsersController {
   ) {}
 
   @Post()
+  @UseInterceptors(ClassSerializerInterceptor)
   async create(@Body() createUserDto: CreateUserDto) {
     const user = new User();
 
