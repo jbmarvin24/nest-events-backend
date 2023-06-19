@@ -22,7 +22,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Attendee } from './attendee.entity';
 import { EventsService } from './events.service';
 import { ListEvents } from './dto/list.events';
-import { UsePipes } from '@nestjs/common/decorators/core';
+import { UseGuards, UsePipes } from '@nestjs/common/decorators/core';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { User } from '../auth/user.entity';
+import { AuthGuardJwt } from '../auth/auth.guard.jwt';
 
 @Controller('/events')
 export class EventsController {
@@ -92,11 +95,9 @@ export class EventsController {
   }
 
   @Post()
-  async create(@Body() dto: CreateEventDto) {
-    return await this.repository.save({
-      ...dto,
-      when: new Date(dto.when),
-    });
+  @UseGuards(AuthGuardJwt)
+  async create(@Body() dto: CreateEventDto, @CurrentUser() user: User) {
+    return await this.eventsService.createEvent(dto, user);
   }
 
   @Patch(':id')
