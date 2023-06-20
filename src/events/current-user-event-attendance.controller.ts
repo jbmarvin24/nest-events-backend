@@ -44,7 +44,7 @@ export class CurrentUserEventAttendanceController {
     );
   }
 
-  @Get()
+  @Get(':eventId')
   @UseGuards(AuthGuardJwt)
   @UseInterceptors(ClassSerializerInterceptor)
   async findOne(
