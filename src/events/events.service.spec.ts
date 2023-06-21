@@ -12,10 +12,10 @@ describe('EventsService', () => {
   let repository: Repository<Event>;
   let selectQb;
   let deleteQb;
-  let mockePaginate;
+  let mockedPaginate;
 
   beforeEach(async () => {
-    mockePaginate = paginator.paginate as jest.Mock;
+    mockedPaginate = paginator.paginate as jest.Mock;
     deleteQb = {
       where: jest.fn(),
       execute: jest.fn(),
@@ -95,6 +95,56 @@ describe('EventsService', () => {
       expect(whereSpy).toHaveBeenCalledTimes(1);
       expect(whereSpy).toHaveBeenCalledWith('id = :id', { id: 1 });
       expect(executeSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getEventsAttendedByUserIdPaginated', () => {
+    it('should return a list of paginated events', async () => {
+      const orderBySpy = jest
+        .spyOn(selectQb, 'orderBy')
+        .mockReturnValue(selectQb);
+      const leftJoinSpy = jest
+        .spyOn(selectQb, 'leftJoinAndSelect')
+        .mockReturnValue(selectQb);
+      const whereSpy = jest.spyOn(selectQb, 'where').mockReturnValue(selectQb);
+
+      mockedPaginate.mockResolvedValue({
+        first: 1,
+        last: 1,
+        total: 10,
+        limit: 10,
+        data: [],
+      });
+
+      expect(
+        service.getEventsAttendedByUserIdPaginated(500, {
+          limit: 1,
+          curentPage: 1,
+        }),
+      ).resolves.toEqual({
+        first: 1,
+        last: 1,
+        total: 10,
+        limit: 10,
+        data: [],
+      });
+
+      expect(orderBySpy).toBeCalledTimes(1);
+      expect(orderBySpy).toBeCalledWith('e.id', 'DESC');
+
+      expect(leftJoinSpy).toBeCalledTimes(1);
+      expect(leftJoinSpy).toBeCalledWith('e.attendees', 'a');
+
+      expect(whereSpy).toBeCalledTimes(1);
+      expect(whereSpy).toBeCalledWith('a.userId = :userId', {
+        userId: 500,
+      });
+
+      expect(mockedPaginate).toBeCalledTimes(1);
+      expect(mockedPaginate).toBeCalledWith(selectQb, {
+        limit: 1,
+        curentPage: 1,
+      });
     });
   });
 });
