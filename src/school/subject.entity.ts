@@ -1,3 +1,4 @@
+import { Field, ObjectType } from '@nestjs/graphql';
 import {
   Column,
   Entity,
@@ -8,11 +9,14 @@ import {
 import { Teacher } from './teacher.entity';
 
 @Entity()
+@ObjectType()
 export class Subject {
   @PrimaryGeneratedColumn()
+  @Field()
   id: number;
 
   @Column()
+  @Field()
   name: string;
 
   @ManyToMany(() => Teacher, (teacher) => teacher.subjects, { cascade: true })
