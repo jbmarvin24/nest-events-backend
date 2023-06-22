@@ -10,7 +10,6 @@ import { Teacher } from './teacher.entity';
 
 @Entity()
 @ObjectType()
-@InputType('SubjectInput')
 export class Subject {
   @PrimaryGeneratedColumn()
   @Field()
