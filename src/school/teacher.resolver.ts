@@ -11,10 +11,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthGuardJwtGql } from '../auth/auth-guard-jwt.gql';
+import { paginate } from '../pagination/paginator';
 import { TeacherAddInput } from './input/teacher-add.input';
 import { TeacherEditInput } from './input/teacher-edit.input';
 import { EntityWithId } from './school.types';
-import { Teacher } from './teacher.entity';
+import { PaginatedTeachers, Teacher } from './teacher.entity';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
@@ -25,9 +26,19 @@ export class TeacherResolver {
     private readonly teachersRepository: Repository<Teacher>,
   ) {}
 
-  @Query(() => [Teacher])
-  public async teachers(): Promise<Teacher[]> {
-    return await this.teachersRepository.find();
+  @Query(() => PaginatedTeachers)
+  public async teachers(
+    @Args('currentPage', { type: () => Int })
+    currentPage: number,
+  ): Promise<PaginatedTeachers> {
+    return paginate<Teacher, PaginatedTeachers>(
+      this.teachersRepository.createQueryBuilder(),
+      PaginatedTeachers,
+      {
+        curentPage: currentPage,
+        limit: 10,
+      },
+    );
   }
 
   @Query(() => Teacher)

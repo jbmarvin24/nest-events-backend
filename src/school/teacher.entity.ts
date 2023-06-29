@@ -6,6 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Paginated } from '../pagination/paginator';
 import { Course } from './course.entity';
 import { Gender } from './school.types';
 import { Subject } from './subject.entity';
@@ -41,3 +42,6 @@ export class Teacher {
   @Field(() => [Course])
   courses: Promise<Course[]>;
 }
+
+@ObjectType()
+export class PaginatedTeachers extends Paginated<Teacher>(Teacher) {}
