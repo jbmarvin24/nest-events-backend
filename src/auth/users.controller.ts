@@ -29,10 +29,6 @@ export class UsersController {
   @Post()
   // @UseInterceptors(ClassSerializerInterceptor)
   async create(@Body() createUserDto: CreateUserDto) {
-    if (createUserDto.password !== createUserDto.retypedPassword) {
-      throw new BadRequestException(['Password are not identical']);
-    }
-
     const existingUser = await this.userRepository.findOne({
       where: [
         { username: createUserDto.username },
