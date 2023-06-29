@@ -1,3 +1,4 @@
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Expose } from 'class-transformer';
 import {
   Column,
@@ -12,13 +13,16 @@ import { Event } from '../events/event.entity';
 import { Profile } from './profile.entity';
 
 @Entity()
+@ObjectType()
 export class User {
   @PrimaryGeneratedColumn()
   @Expose()
+  @Field(() => Int)
   id: number;
 
   @Column({ unique: true })
   @Expose()
+  @Field()
   username: string;
 
   @Column()
@@ -26,10 +30,12 @@ export class User {
 
   @Column({ unique: true })
   @Expose()
+  @Field()
   email: string;
 
   @Column()
   @Expose()
+  @Field()
   firstName: string;
 
   @OneToOne(() => Profile)
