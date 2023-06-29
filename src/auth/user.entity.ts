@@ -15,6 +15,10 @@ import { Profile } from './profile.entity';
 @Entity()
 @ObjectType()
 export class User {
+  constructor(partial?: Partial<User>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn()
   @Expose()
   @Field(() => Int)

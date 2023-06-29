@@ -12,22 +12,23 @@ import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create.user.dto';
 import { User } from './user.entity';
+import { UserService } from './user.service';
 
 @Controller('users')
-@SerializeOptions({ strategy: 'excludeAll' })
+// @SerializeOptions({ strategy: 'excludeAll' })
 export class UsersController {
   constructor(
     private readonly authService: AuthService,
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    private readonly userService: UserService,
   ) {}
 
   @Post()
-  @UseInterceptors(ClassSerializerInterceptor)
+  // @UseInterceptors(ClassSerializerInterceptor)
   async create(@Body() createUserDto: CreateUserDto) {
-    const user = new User();
-
     if (createUserDto.password !== createUserDto.retypedPassword) {
       throw new BadRequestException(['Password are not identical']);
     }
@@ -43,12 +44,7 @@ export class UsersController {
       throw new BadRequestException(['username or email is already taken.']);
     }
 
-    user.username = createUserDto.username;
-    user.password = await this.authService.hashPassword(createUserDto.password);
-    user.email = createUserDto.email;
-    user.firstName = createUserDto.firstName;
-
-    const createdUser = await this.userRepository.save(user);
+    const createdUser = await this.userService.create(createUserDto);
 
     return {
       ...createdUser,
